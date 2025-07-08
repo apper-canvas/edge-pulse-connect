@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import ApperIcon from '@/components/ApperIcon';
@@ -9,12 +10,13 @@ import Loading from '@/components/ui/Loading';
 import Empty from '@/components/ui/Empty';
 
 const Notifications = () => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
   // Mock notifications data
-  const mockNotifications = [
+const mockNotifications = [
     {
       Id: 1,
       type: 'like',
@@ -25,10 +27,11 @@ const Notifications = () => {
         username: 'sarah_chen',
         avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9c9e14a?w=150&h=150&fit=crop&crop=face'
       },
+      postId: 1,
       timestamp: '2024-01-15T10:30:00Z',
       read: false
     },
-    {
+{
       Id: 2,
       type: 'comment',
       message: 'commented on your post',
@@ -38,6 +41,7 @@ const Notifications = () => {
         username: 'mike_adventures',
         avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
       },
+      postId: 2,
       timestamp: '2024-01-15T09:15:00Z',
       read: false
     },
@@ -54,7 +58,7 @@ const Notifications = () => {
       timestamp: '2024-01-14T16:20:00Z',
       read: true
     },
-    {
+{
       Id: 4,
       type: 'like',
       message: 'liked your post',
@@ -64,6 +68,7 @@ const Notifications = () => {
         username: 'alex_fitness',
         avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
       },
+      postId: 3,
       timestamp: '2024-01-14T14:45:00Z',
       read: true
     }
@@ -91,6 +96,32 @@ const Notifications = () => {
         return { name: 'UserPlus', color: 'text-secondary' };
       default:
         return { name: 'Bell', color: 'text-gray-500' };
+    }
+  };
+
+const handleNotificationClick = (notification) => {
+    // Mark as read
+    setNotifications(prev => 
+      prev.map(n => 
+        n.Id === notification.Id ? { ...n, read: true } : n
+      )
+    );
+
+    // Navigate based on notification type
+    switch (notification.type) {
+      case 'like':
+      case 'comment':
+        if (notification.postId) {
+          navigate(`/post/${notification.postId}`);
+        }
+        break;
+      case 'follow':
+        if (notification.user?.Id) {
+          navigate(`/profile/${notification.user.Id}`);
+        }
+        break;
+      default:
+        break;
     }
   };
 
@@ -200,10 +231,10 @@ const Notifications = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className={`bg-white rounded-xl border border-gray-200 shadow-card p-4 cursor-pointer transition-all duration-200 hover:shadow-card-hover ${
+className={`bg-white rounded-xl border border-gray-200 shadow-card p-4 cursor-pointer transition-all duration-200 hover:shadow-card-hover ${
                     !notification.read ? 'border-l-4 border-l-primary' : ''
                   }`}
-                  onClick={() => markAsRead(notification.Id)}
+                  onClick={() => handleNotificationClick(notification)}
                 >
                   <div className="flex items-start gap-3">
                     <div className="relative">
