@@ -12,6 +12,67 @@ const PostCard = ({ post, onLike, onComment, onShare, className }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(post.likes || 0);
   const [showFullContent, setShowFullContent] = useState(false);
+// Image loading component with error handling
+  const ImageWithFallback = ({ src, alt, className, fallbackSrc, placeholderClassName }) => {
+    const [imageState, setImageState] = useState('loading');
+    const [currentSrc, setCurrentSrc] = useState(src);
+    const [retryCount, setRetryCount] = useState(0);
+    const maxRetries = 2;
+
+    const handleImageLoad = () => {
+      setImageState('loaded');
+    };
+
+    const handleImageError = () => {
+      if (retryCount < maxRetries) {
+        // Retry with cache-busting parameter
+        const timestamp = Date.now();
+        setCurrentSrc(`${src}?retry=${timestamp}`);
+        setRetryCount(prev => prev + 1);
+      } else if (fallbackSrc) {
+        setCurrentSrc(fallbackSrc);
+        setRetryCount(0);
+      } else {
+        setImageState('error');
+      }
+    };
+
+    if (imageState === 'loading') {
+      return (
+        <>
+          <div className={placeholderClassName} />
+          <img
+            src={currentSrc}
+            alt={alt}
+            className={`${className} opacity-0 absolute`}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            loading="lazy"
+          />
+        </>
+      );
+    }
+
+    if (imageState === 'error') {
+      return (
+        <div className={`${className} bg-gray-100 flex items-center justify-center`}>
+          <div className="text-center text-gray-500">
+            <ApperIcon name="ImageOff" className="w-8 h-8 mx-auto mb-2" />
+            <p className="text-sm">Image unavailable</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <img
+        src={currentSrc}
+        alt={alt}
+        className={`${className} fade-in`}
+        loading="lazy"
+      />
+    );
+  };
 
   const handleLike = async () => {
     if (onLike) {
@@ -108,14 +169,16 @@ const PostCard = ({ post, onLike, onComment, onShare, className }) => {
         )}
       </div>
 
-      {/* Media */}
+{/* Media */}
       {post.mediaUrls && post.mediaUrls.length > 0 && (
         <div className="px-4 pb-3">
-          <div className="rounded-lg overflow-hidden">
-            <img
+          <div className="rounded-lg overflow-hidden bg-gray-100">
+            <ImageWithFallback
               src={post.mediaUrls[0]}
               alt="Post media"
               className="w-full h-auto max-h-96 object-cover"
+              fallbackSrc="/api/placeholder/600/400"
+              placeholderClassName="w-full h-64 bg-gray-200 shimmer rounded-lg"
             />
           </div>
         </div>

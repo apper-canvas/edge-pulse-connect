@@ -171,3 +171,66 @@ body {
     padding-bottom: 80px;
   }
 }
+
+/* Image Loading Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.3s ease-in-out;
+}
+
+/* Enhanced Shimmer for Images */
+.shimmer {
+  animation: shimmer 1.5s infinite;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0px,
+    #e0e0e0 40px,
+    #f0f0f0 80px
+  );
+  background-size: 200px;
+}
+
+/* Image Error State */
+.image-error {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 2px dashed #cbd5e1;
+}
+
+/* Image Loading State */
+.image-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.image-loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: loading-shimmer 2s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}

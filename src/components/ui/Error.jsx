@@ -1,8 +1,8 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import ApperIcon from '@/components/ApperIcon';
-import Button from '@/components/atoms/Button';
-import { cn } from '@/utils/cn';
+import React from "react";
+import { motion } from "framer-motion";
+import { cn } from "@/utils/cn";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
 
 const Error = ({ 
   title = "Something went wrong", 
@@ -11,30 +11,36 @@ const Error = ({
   variant = 'default',
   className 
 }) => {
-  const variants = {
+const variants = {
     default: {
-      icon: 'AlertCircle',
-      iconColor: 'text-error',
-      bgColor: 'bg-error/5',
-      borderColor: 'border-error/20'
+      icon: "AlertCircle",
+      iconColor: "text-error",
+      bgColor: "bg-error/5",
+      borderColor: "border-error/20"
     },
     network: {
-      icon: 'WifiOff',
-      iconColor: 'text-warning',
-      bgColor: 'bg-warning/5',
-      borderColor: 'border-warning/20'
+      icon: "WifiOff",
+      iconColor: "text-warning",
+      bgColor: "bg-warning/5",
+      borderColor: "border-warning/20"
+    },
+    image: {
+      icon: "ImageOff",
+      iconColor: "text-gray-400",
+      bgColor: "bg-gray-50",
+      borderColor: "border-gray-200"
     },
     notFound: {
-      icon: 'Search',
-      iconColor: 'text-gray-400',
-      bgColor: 'bg-gray-50',
-      borderColor: 'border-gray-200'
+      icon: "Search",
+      iconColor: "text-gray-400",
+      bgColor: "bg-gray-50",
+      borderColor: "border-gray-200"
     },
     server: {
-      icon: 'Server',
-      iconColor: 'text-error',
-      bgColor: 'bg-error/5',
-      borderColor: 'border-error/20'
+      icon: "Server",
+      iconColor: "text-error",
+      bgColor: "bg-error/5",
+      borderColor: "border-error/20"
     }
   };
 
