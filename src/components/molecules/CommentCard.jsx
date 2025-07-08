@@ -6,8 +6,9 @@ import ApperIcon from '@/components/ApperIcon';
 import Avatar from '@/components/atoms/Avatar';
 import Button from '@/components/atoms/Button';
 import { cn } from '@/utils/cn';
+import CommentForm from './CommentForm';
 
-const CommentCard = ({ comment, onLike, onReply, onDelete, className }) => {
+const CommentCard = ({ comment, onLike, onReply, onDelete, replies = [], className }) => {
   const [isLiked, setIsLiked] = React.useState(false);
   const [showReplyForm, setShowReplyForm] = React.useState(false);
 
@@ -17,18 +18,23 @@ const CommentCard = ({ comment, onLike, onReply, onDelete, className }) => {
       onLike(comment.Id, !isLiked);
     }
   };
-
-  const handleReply = () => {
+const handleReply = () => {
     setShowReplyForm(!showReplyForm);
   };
 
+  const handleReplySubmit = async (content) => {
+    if (onReply) {
+      await onReply(content, comment.Id);
+      setShowReplyForm(false);
+    }
+  };
   const handleDelete = () => {
     if (onDelete && window.confirm('Are you sure you want to delete this comment?')) {
       onDelete(comment.Id);
     }
   };
 
-  return (
+return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -98,6 +104,34 @@ const CommentCard = ({ comment, onLike, onReply, onDelete, className }) => {
               <span className="text-xs">Delete</span>
             </Button>
           </div>
+          
+          {/* Reply Form */}
+          {showReplyForm && (
+            <div className="mt-4">
+              <CommentForm
+                onSubmit={handleReplySubmit}
+                placeholder={`Reply to ${comment.author?.displayName}...`}
+                className="border-l-2 border-gray-200 pl-4"
+              />
+            </div>
+          )}
+          
+          {/* Nested Replies */}
+          {replies.length > 0 && (
+            <div className="mt-4 space-y-3">
+              {replies.map((reply) => (
+                <div key={reply.Id} className="ml-6 border-l-2 border-gray-100 pl-4">
+                  <CommentCard
+                    comment={reply}
+                    onLike={onLike}
+                    onReply={onReply}
+                    onDelete={onDelete}
+                    className="bg-gray-50"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

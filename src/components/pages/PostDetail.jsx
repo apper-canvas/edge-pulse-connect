@@ -112,6 +112,24 @@ export default function PostDetail() {
       console.error('Error posting comment:', err);
       toast.error('Failed to post comment');
     }
+};
+
+  const handleReplySubmit = async (content, parentId) => {
+    try {
+      const newComment = await commentService.create({
+        postId: parseInt(id),
+        authorId: 1, // Current user ID
+        content,
+        parentId
+      });
+      
+      setComments(prev => [...prev, newComment]);
+      setPost(prev => ({ ...prev, comments: prev.comments + 1 }));
+      toast.success('Reply posted successfully!');
+    } catch (err) {
+      console.error('Error posting reply:', err);
+      toast.error('Failed to post reply');
+    }
   };
 
   const handleCommentDelete = async (commentId) => {
@@ -211,13 +229,15 @@ export default function PostDetail() {
             message="Be the first to share your thoughts!"
             variant="comments"
           />
-        ) : (
+) : (
           <div className="space-y-4">
             {comments.map((comment) => (
               <CommentCard
                 key={comment.Id}
                 comment={comment}
                 onDelete={handleCommentDelete}
+                onReply={handleReplySubmit}
+                replies={comments.filter(c => c.parentId === comment.Id)}
               />
             ))}
           </div>

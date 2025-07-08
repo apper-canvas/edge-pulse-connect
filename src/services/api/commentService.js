@@ -21,12 +21,13 @@ export const commentService = {
       });
   },
 
-  async create(commentData) {
+async create(commentData) {
     await delay(200);
     const newComment = {
       Id: Math.max(...comments.map(c => c.Id)) + 1,
       ...commentData,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      parentId: commentData.parentId || null
     };
     
     comments.push(newComment);

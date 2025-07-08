@@ -6,7 +6,7 @@ import Button from '@/components/atoms/Button';
 import Textarea from '@/components/atoms/Textarea';
 import { cn } from '@/utils/cn';
 
-const CommentForm = ({ onSubmit, placeholder = "Write a comment...", className }) => {
+const CommentForm = ({ onSubmit, placeholder = "Write a comment...", parentId = null, className }) => {
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -41,11 +41,14 @@ const CommentForm = ({ onSubmit, placeholder = "Write a comment...", className }
           fallback="You"
         />
         <div className="flex-1">
-          <Textarea
+<Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder={placeholder}
-            className="min-h-[80px] resize-none border-none focus:ring-0 p-0 text-sm"
+            className={cn(
+              "resize-none border-none focus:ring-0 p-0 text-sm",
+              parentId ? "min-h-[60px]" : "min-h-[80px]"
+            )}
           />
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center gap-2">
