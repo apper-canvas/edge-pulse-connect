@@ -59,14 +59,17 @@ const Chat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSendMessage = async () => {
+const handleSendMessage = async () => {
     if (!messageText.trim() || sending) return;
+
+    // Declare tempMessage outside try-catch for proper scope access
+    let tempMessage;
 
     try {
       setSending(true);
       
       // Optimistic update
-      const tempMessage = {
+      tempMessage = {
         Id: Date.now(), // Temporary ID
         content: messageText,
         senderId: 1, // Assuming current user ID is 1
@@ -97,8 +100,10 @@ const Chat = () => {
       
     } catch (err) {
       toast.error('Failed to send message');
-      // Remove temp message on error
-      setMessages(prev => prev.filter(msg => msg.Id !== tempMessage.Id));
+      // Remove temp message on error - now tempMessage is accessible
+      if (tempMessage) {
+        setMessages(prev => prev.filter(msg => msg.Id !== tempMessage.Id));
+      }
     } finally {
       setSending(false);
     }
