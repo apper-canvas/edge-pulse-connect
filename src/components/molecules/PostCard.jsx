@@ -89,37 +89,88 @@ const PostCard = ({ post, onLike, onComment, onShare, className }) => {
     }
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
+const handleShare = async () => {
+    // Construct the share URL - use current page or post-specific URL
+    const shareUrl = `${window.location.origin}${window.location.pathname}`;
+    const shareData = {
+      title: 'Check out this post on Pulse Connect',
+      text: `${post.content?.substring(0, 100)}${post.content?.length > 100 ? '...' : ''}`,
+      url: shareUrl
+    };
+
+    // Check if Web Share API is available and site is served over HTTPS
+    if (navigator.share && window.location.protocol === 'https:') {
       try {
-        await navigator.share({
-          title: 'Check out this post on Pulse Connect',
-          url: window.location.href
-        });
+        await navigator.share(shareData);
         toast.success('Post shared successfully!');
+        return;
       } catch (error) {
-        // Handle permission denied or user cancellation
+        console.error('Share failed:', error);
+        
+        // Handle specific error types
         if (error.name === 'AbortError') {
           // User cancelled the share - no need to show error
           return;
         }
-        console.error('Share failed:', error);
-        // Fallback to clipboard copy
-        try {
-          await navigator.clipboard.writeText(window.location.href);
-          toast.success('Link copied to clipboard!');
-        } catch (clipboardError) {
-          toast.error('Failed to share or copy link');
+        
+        if (error.name === 'NotAllowedError') {
+          // Permission denied - likely HTTPS issue or user gesture requirement
+          console.warn('Share permission denied. Falling back to clipboard copy.');
+          toast.info('Share not available. Copying link instead...');
+        } else {
+          // Other errors (DataError, TypeError, etc.)
+          toast.info('Share unavailable. Copying link to clipboard...');
         }
+        
+        // Fallback to clipboard copy
+        await attemptClipboardCopy(shareUrl);
       }
     } else {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        toast.success('Link copied to clipboard!');
-} catch (error) {
-        toast.error('Failed to copy link to clipboard');
-      }
+      // Web Share API not available or not HTTPS - use clipboard fallback
+      await attemptClipboardCopy(shareUrl);
     }
+  };
+
+  const attemptClipboardCopy = async (url) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+        toast.success('Link copied to clipboard!');
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        await fallbackCopyToClipboard(url);
+        toast.success('Link copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('Clipboard copy failed:', error);
+      toast.error('Unable to copy link. Please copy manually: ' + url);
+    }
+  };
+
+  const fallbackCopyToClipboard = (text) => {
+    return new Promise((resolve, reject) => {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) {
+          resolve();
+        } else {
+          reject(new Error('Copy command failed'));
+        }
+      } catch (err) {
+        document.body.removeChild(textArea);
+        reject(err);
+      }
+    });
   };
 
   const contentPreview = post.content.length > 200 ? 
