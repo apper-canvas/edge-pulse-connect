@@ -1,0 +1,137 @@
+[
+  {
+    "Id": 1,
+    "participants": [
+      {
+        "Id": 1,
+        "name": "You",
+        "username": "you",
+        "avatar": "/api/placeholder/40/40"
+      },
+      {
+        "Id": 2,
+        "name": "Sarah Wilson",
+        "username": "sarahw",
+        "avatar": "/api/placeholder/40/40"
+      }
+    ],
+    "lastMessage": {
+      "Id": 101,
+      "content": "Hey! How's your day going?",
+      "senderId": 2,
+      "timestamp": "2024-01-15T14:30:00Z",
+      "isRead": false
+    },
+    "unreadCount": 2,
+    "createdAt": "2024-01-10T10:00:00Z",
+    "updatedAt": "2024-01-15T14:30:00Z"
+  },
+  {
+    "Id": 2,
+    "participants": [
+      {
+        "Id": 1,
+        "name": "You",
+        "username": "you",
+        "avatar": "/api/placeholder/40/40"
+      },
+      {
+        "Id": 3,
+        "name": "Mike Johnson",
+        "username": "mikej",
+        "avatar": "/api/placeholder/40/40"
+      }
+    ],
+    "lastMessage": {
+      "Id": 102,
+      "content": "Thanks for the help earlier!",
+      "senderId": 1,
+      "timestamp": "2024-01-15T12:15:00Z",
+      "isRead": true
+    },
+    "unreadCount": 0,
+    "createdAt": "2024-01-12T09:00:00Z",
+    "updatedAt": "2024-01-15T12:15:00Z"
+  },
+  {
+    "Id": 3,
+    "participants": [
+      {
+        "Id": 1,
+        "name": "You",
+        "username": "you",
+        "avatar": "/api/placeholder/40/40"
+      },
+      {
+        "Id": 4,
+        "name": "Emily Chen",
+        "username": "emilyc",
+        "avatar": "/api/placeholder/40/40"
+      }
+    ],
+    "lastMessage": {
+      "Id": 103,
+      "content": "See you at the meeting tomorrow!",
+      "senderId": 4,
+      "timestamp": "2024-01-14T16:45:00Z",
+      "isRead": true
+    },
+    "unreadCount": 0,
+    "createdAt": "2024-01-08T14:00:00Z",
+    "updatedAt": "2024-01-14T16:45:00Z"
+  },
+  {
+    "Id": 4,
+    "participants": [
+      {
+        "Id": 1,
+        "name": "You",
+        "username": "you",
+        "avatar": "/api/placeholder/40/40"
+      },
+      {
+        "Id": 5,
+        "name": "David Brown",
+        "username": "davidb",
+        "avatar": "/api/placeholder/40/40"
+      }
+    ],
+    "lastMessage": {
+      "Id": 104,
+      "content": "Perfect! Let me know when you're ready.",
+      "senderId": 1,
+      "timestamp": "2024-01-14T11:20:00Z",
+      "isRead": true
+    },
+    "unreadCount": 0,
+    "createdAt": "2024-01-13T08:00:00Z",
+    "updatedAt": "2024-01-14T11:20:00Z"
+  },
+  {
+    "Id": 5,
+    "participants": [
+      {
+        "Id": 1,
+        "name": "You",
+        "username": "you",
+        "avatar": "/api/placeholder/40/40"
+      },
+      {
+        "Id": 6,
+        "name": "Lisa Anderson",
+        "username": "lisaa",
+        "avatar": "/api/placeholder/40/40"
+      }
+    ],
+    "lastMessage": {
+      "Id": 105,
+      "content": "Great work on the presentation!",
+      "senderId": 6,
+      "timestamp": "2024-01-13T15:30:00Z",
+      "isRead": false
+    },
+    "unreadCount": 1,
+    "createdAt": "2024-01-11T13:00:00Z",
+    "updatedAt": "2024-01-13T15:30:00Z"
+  }
+]

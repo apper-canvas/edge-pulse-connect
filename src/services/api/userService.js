@@ -1,9 +1,8 @@
-import userData from '../mockData/users.json';
-import followData from '../mockData/follows.json';
+import userData from "@/services/mockData/users.json";
+import followData from "@/services/mockData/follows.json";
 
 let users = [...userData];
 let follows = [...followData];
-
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const userService = {
@@ -44,11 +43,15 @@ export const userService = {
       }));
   },
 
-  async getTrendingUsers() {
+async getTrendingUsers() {
     await delay(300);
     return users
-      .sort((a, b) => b.followersCount - a.followersCount)
-      .slice(0, 5)
+      .sort((a, b) => {
+        const aFollowers = follows.filter(f => f.followingId === a.Id).length;
+        const bFollowers = follows.filter(f => f.followingId === b.Id).length;
+        return bFollowers - aFollowers;
+      })
+      .slice(0, 10)
       .map(user => ({
         ...user,
         followersCount: follows.filter(f => f.followingId === user.Id).length,
@@ -56,30 +59,44 @@ export const userService = {
       }));
   },
 
-  async getFollowers(userId) {
+  async getUsersForChat() {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Return all users except current user (assuming current user ID is 1)
+    return users.filter(user => user.Id !== 1).map(user => ({
+      Id: user.Id,
+      name: user.name,
+      username: user.username,
+      avatar: user.avatar
+    }));
+  },
+
+async getFollowers(userId) {
     await delay(250);
     const userFollows = follows.filter(f => f.followingId === userId);
     return userFollows.map(follow => {
       const user = users.find(u => u.Id === follow.followerId);
+      if (!user) return null;
       return {
         ...user,
         followersCount: follows.filter(f => f.followingId === user.Id).length,
         followingCount: follows.filter(f => f.followerId === user.Id).length
       };
-    });
+    }).filter(Boolean);
   },
 
-  async getFollowing(userId) {
+async getFollowing(userId) {
     await delay(250);
     const userFollows = follows.filter(f => f.followerId === userId);
     return userFollows.map(follow => {
       const user = users.find(u => u.Id === follow.followingId);
+      if (!user) return null;
       return {
         ...user,
         followersCount: follows.filter(f => f.followingId === user.Id).length,
         followingCount: follows.filter(f => f.followerId === user.Id).length
       };
-    });
+    }).filter(Boolean);
   },
 
   async followUser(followerId, followingId) {
@@ -126,13 +143,11 @@ f.followerId === followerId && f.followingId === followingId
       pushEnabled: false
     };
   },
-
 async updateNotificationPreferences(userId, preferences) {
     await delay(100);
     localStorage.setItem(`notification_prefs_${userId}`, JSON.stringify(preferences));
     return preferences;
   },
-
   async getPrivacySettings(userId) {
     await delay(100);
     const saved = localStorage.getItem(`privacy_settings_${userId}`);
@@ -160,8 +175,7 @@ async updateNotificationPreferences(userId, preferences) {
     // Check if already blocked
     const isAlreadyBlocked = blockedList.some(user => user.Id === blockedId);
     if (isAlreadyBlocked) return true;
-    
-    // Get user to block
+// Get user to block
     const userToBlock = users.find(u => u.Id === blockedId);
     if (!userToBlock) throw new Error('User not found');
     
