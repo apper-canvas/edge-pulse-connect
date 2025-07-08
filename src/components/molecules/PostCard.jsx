@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { formatDistanceToNow } from 'date-fns';
-import { Link } from 'react-router-dom';
-import ApperIcon from '@/components/ApperIcon';
-import Avatar from '@/components/atoms/Avatar';
-import Button from '@/components/atoms/Button';
-import Badge from '@/components/atoms/Badge';
-import { cn } from '@/utils/cn';
-
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { formatDistanceToNow } from "date-fns";
+import { Link } from "react-router-dom";
+import { cn } from "@/utils/cn";
+import ApperIcon from "@/components/ApperIcon";
+import Badge from "@/components/atoms/Badge";
+import Avatar from "@/components/atoms/Avatar";
+import Button from "@/components/atoms/Button";
+import { toast } from "react-hot-toast";
 const PostCard = ({ post, onLike, onComment, onShare, className }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(post.likes || 0);
@@ -80,7 +80,7 @@ const PostCard = ({ post, onLike, onComment, onShare, className }) => {
       setLikes(newLikes);
       setIsLiked(!isLiked);
     }
-  };
+};
 
   const handleComment = () => {
     if (onComment) {
@@ -88,9 +88,36 @@ const PostCard = ({ post, onLike, onComment, onShare, className }) => {
     }
   };
 
-  const handleShare = () => {
-    if (onShare) {
-      onShare(post.Id);
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Check out this post on Pulse Connect',
+          url: window.location.href
+        });
+        toast.success('Post shared successfully!');
+      } catch (error) {
+        // Handle permission denied or user cancellation
+        if (error.name === 'AbortError') {
+          // User cancelled the share - no need to show error
+          return;
+        }
+        console.error('Share failed:', error);
+        // Fallback to clipboard copy
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          toast.success('Link copied to clipboard!');
+        } catch (clipboardError) {
+          toast.error('Failed to share or copy link');
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Link copied to clipboard!');
+      } catch (error) {
+        toast.error('Failed to copy link to clipboard');
+}
     }
   };
 

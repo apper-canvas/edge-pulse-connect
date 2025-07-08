@@ -84,15 +84,36 @@ export default function PostDetail() {
     document.getElementById('comments-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleShare = (postId) => {
+const handleShare = async (postId) => {
     if (navigator.share) {
-      navigator.share({
-        title: 'Check out this post on Pulse Connect',
-        url: window.location.href
-      });
+      try {
+        await navigator.share({
+          title: 'Check out this post on Pulse Connect',
+          url: window.location.href
+        });
+        toast.success('Post shared successfully!');
+      } catch (error) {
+        // Handle permission denied or user cancellation
+        if (error.name === 'AbortError') {
+          // User cancelled the share - no need to show error
+          return;
+        }
+        console.error('Share failed:', error);
+        // Fallback to clipboard copy
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          toast.success('Link copied to clipboard!');
+        } catch (clipboardError) {
+          toast.error('Failed to share or copy link');
+        }
+      }
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copied to clipboard!');
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Link copied to clipboard!');
+      } catch (error) {
+        toast.error('Failed to copy link to clipboard');
+      }
     }
   };
 
