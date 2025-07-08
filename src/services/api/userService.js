@@ -1,139 +1,382 @@
-import userData from "@/services/mockData/users.json";
-import followData from "@/services/mockData/follows.json";
-
-let users = [...userData];
-let follows = [...followData];
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+import { toast } from 'react-toastify';
 
 export const userService = {
   async getAll() {
-    await delay(300);
-    return users.map(user => ({
-      ...user,
-      followersCount: follows.filter(f => f.followingId === user.Id).length,
-      followingCount: follows.filter(f => f.followerId === user.Id).length
-    }));
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "username" } },
+          { field: { Name: "display_name" } },
+          { field: { Name: "avatar" } },
+          { field: { Name: "bio" } },
+          { field: { Name: "followers_count" } },
+          { field: { Name: "following_count" } },
+          { field: { Name: "posts_count" } },
+          { field: { Name: "is_private" } }
+        ]
+      };
+
+      const response = await apperClient.fetchRecords('user_profile', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching users:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async getById(id) {
-    await delay(200);
-    const user = users.find(u => u.Id === id);
-    if (!user) return null;
-    
-    return {
-      ...user,
-      followersCount: follows.filter(f => f.followingId === user.Id).length,
-      followingCount: follows.filter(f => f.followerId === user.Id).length
-    };
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "username" } },
+          { field: { Name: "display_name" } },
+          { field: { Name: "avatar" } },
+          { field: { Name: "bio" } },
+          { field: { Name: "followers_count" } },
+          { field: { Name: "following_count" } },
+          { field: { Name: "posts_count" } },
+          { field: { Name: "is_private" } }
+        ]
+      };
+
+      const response = await apperClient.getRecordById('user_profile', id, params);
+      
+      if (!response || !response.data) {
+        return null;
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching user with ID ${id}:`, error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
+    }
   },
 
   async searchUsers(query) {
-    await delay(250);
-    const lowerQuery = query.toLowerCase();
-    return users
-      .filter(user => 
-        user.username.toLowerCase().includes(lowerQuery) ||
-        user.displayName.toLowerCase().includes(lowerQuery)
-      )
-      .slice(0, 10)
-      .map(user => ({
-        ...user,
-        followersCount: follows.filter(f => f.followingId === user.Id).length,
-        followingCount: follows.filter(f => f.followerId === user.Id).length
-      }));
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "username" } },
+          { field: { Name: "display_name" } },
+          { field: { Name: "avatar" } },
+          { field: { Name: "bio" } },
+          { field: { Name: "followers_count" } },
+          { field: { Name: "following_count" } },
+          { field: { Name: "posts_count" } }
+        ],
+        whereGroups: [{
+          operator: "OR",
+          subGroups: [
+            {
+              conditions: [{
+                fieldName: "username",
+                operator: "Contains",
+                values: [query]
+              }],
+              operator: "OR"
+            },
+            {
+              conditions: [{
+                fieldName: "display_name",
+                operator: "Contains",
+                values: [query]
+              }],
+              operator: "OR"
+            }
+          ]
+        }],
+        pagingInfo: {
+          limit: 10,
+          offset: 0
+        }
+      };
+
+      const response = await apperClient.fetchRecords('user_profile', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error searching users:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
-async getTrendingUsers() {
-    await delay(300);
-    return users
-      .sort((a, b) => {
-        const aFollowers = follows.filter(f => f.followingId === a.Id).length;
-        const bFollowers = follows.filter(f => f.followingId === b.Id).length;
-        return bFollowers - aFollowers;
-      })
-      .slice(0, 10)
-      .map(user => ({
-        ...user,
-        followersCount: follows.filter(f => f.followingId === user.Id).length,
-        followingCount: follows.filter(f => f.followerId === user.Id).length
-      }));
+  async getTrendingUsers() {
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "username" } },
+          { field: { Name: "display_name" } },
+          { field: { Name: "avatar" } },
+          { field: { Name: "bio" } },
+          { field: { Name: "followers_count" } },
+          { field: { Name: "following_count" } },
+          { field: { Name: "posts_count" } }
+        ],
+        orderBy: [{
+          fieldName: "followers_count",
+          sorttype: "DESC"
+        }],
+        pagingInfo: {
+          limit: 10,
+          offset: 0
+        }
+      };
+
+      const response = await apperClient.fetchRecords('user_profile', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching trending users:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async getUsersForChat() {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Return all users except current user (assuming current user ID is 1)
-    return users.filter(user => user.Id !== 1).map(user => ({
-      Id: user.Id,
-      name: user.name,
-      username: user.username,
-      avatar: user.avatar
-    }));
-  },
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
 
-async getFollowers(userId) {
-    await delay(250);
-    const userFollows = follows.filter(f => f.followingId === userId);
-    return userFollows.map(follow => {
-      const user = users.find(u => u.Id === follow.followerId);
-      if (!user) return null;
-      return {
-        ...user,
-        followersCount: follows.filter(f => f.followingId === user.Id).length,
-        followingCount: follows.filter(f => f.followerId === user.Id).length
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "username" } },
+          { field: { Name: "display_name" } },
+          { field: { Name: "avatar" } }
+        ]
       };
-    }).filter(Boolean);
-  },
 
-async getFollowing(userId) {
-    await delay(250);
-    const userFollows = follows.filter(f => f.followerId === userId);
-    return userFollows.map(follow => {
-      const user = users.find(u => u.Id === follow.followingId);
-      if (!user) return null;
-      return {
-        ...user,
-        followersCount: follows.filter(f => f.followingId === user.Id).length,
-        followingCount: follows.filter(f => f.followerId === user.Id).length
-      };
-    }).filter(Boolean);
+      const response = await apperClient.fetchRecords('user_profile', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching users for chat:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async followUser(followerId, followingId) {
-    await delay(200);
-    const existingFollow = follows.find(f => 
-      f.followerId === followerId && f.followingId === followingId
-    );
-    
-    if (!existingFollow) {
-      follows.push({
-        followerId,
-        followingId,
-        timestamp: new Date().toISOString()
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       });
+
+      const params = {
+        records: [{
+          follower_id: followerId,
+          following_id: followingId,
+          timestamp: new Date().toISOString()
+        }]
+      };
+
+      const response = await apperClient.createRecord('follow', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error following user:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return false;
     }
-    
-    return true;
   },
 
   async unfollowUser(followerId, followingId) {
-    await delay(200);
-    follows = follows.filter(f => 
-      !(f.followerId === followerId && f.followingId === followingId)
-    );
-    
-    return true;
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      // First find the follow record
+      const searchParams = {
+        fields: [{ field: { Name: "Name" } }],
+        whereGroups: [{
+          operator: "AND",
+          subGroups: [
+            {
+              conditions: [{
+                fieldName: "follower_id",
+                operator: "EqualTo",
+                values: [followerId]
+              }],
+              operator: "AND"
+            },
+            {
+              conditions: [{
+                fieldName: "following_id", 
+                operator: "EqualTo",
+                values: [followingId]
+              }],
+              operator: "AND"
+            }
+          ]
+        }]
+      };
+
+      const searchResponse = await apperClient.fetchRecords('follow', searchParams);
+      
+      if (!searchResponse.success || !searchResponse.data || searchResponse.data.length === 0) {
+        return true; // Already unfollowed
+      }
+
+      const followRecord = searchResponse.data[0];
+      const deleteParams = {
+        RecordIds: [followRecord.Id]
+      };
+
+      const response = await apperClient.deleteRecord('follow', deleteParams);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error unfollowing user:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return false;
+    }
   },
 
   async isFollowing(followerId, followingId) {
-    await delay(100);
-    return follows.some(f => 
-f.followerId === followerId && f.followingId === followingId
-    );
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [{ field: { Name: "Name" } }],
+        whereGroups: [{
+          operator: "AND",
+          subGroups: [
+            {
+              conditions: [{
+                fieldName: "follower_id",
+                operator: "EqualTo",
+                values: [followerId]
+              }],
+              operator: "AND"
+            },
+            {
+              conditions: [{
+                fieldName: "following_id",
+                operator: "EqualTo", 
+                values: [followingId]
+              }],
+              operator: "AND"
+            }
+          ]
+        }]
+      };
+
+      const response = await apperClient.fetchRecords('follow', params);
+      
+      if (!response.success) {
+        return false;
+      }
+
+      return response.data && response.data.length > 0;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error checking follow status:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return false;
+    }
   },
 
   async getNotificationPreferences(userId) {
-    await delay(100);
     const saved = localStorage.getItem(`notification_prefs_${userId}`);
     return saved ? JSON.parse(saved) : {
       likes: true,
@@ -143,13 +386,13 @@ f.followerId === followerId && f.followingId === followingId
       pushEnabled: false
     };
   },
-async updateNotificationPreferences(userId, preferences) {
-    await delay(100);
+
+  async updateNotificationPreferences(userId, preferences) {
     localStorage.setItem(`notification_prefs_${userId}`, JSON.stringify(preferences));
     return preferences;
   },
+
   async getPrivacySettings(userId) {
-    await delay(100);
     const saved = localStorage.getItem(`privacy_settings_${userId}`);
     return saved ? JSON.parse(saved) : {
       isPrivateProfile: false,
@@ -162,26 +405,24 @@ async updateNotificationPreferences(userId, preferences) {
   },
 
   async updatePrivacySettings(userId, settings) {
-    await delay(200);
     localStorage.setItem(`privacy_settings_${userId}`, JSON.stringify(settings));
     return settings;
   },
 
   async blockUser(blockerId, blockedId) {
-    await delay(200);
-    const blocked = this.getBlockedUsers(blockerId);
-    const blockedList = await blocked;
+    const blocked = await this.getBlockedUsers(blockerId);
     
     // Check if already blocked
-    const isAlreadyBlocked = blockedList.some(user => user.Id === blockedId);
+    const isAlreadyBlocked = blocked.some(user => user.Id === blockedId);
     if (isAlreadyBlocked) return true;
-// Get user to block
-    const userToBlock = users.find(u => u.Id === blockedId);
+
+    // Get user to block
+    const userToBlock = await this.getById(blockedId);
     if (!userToBlock) throw new Error('User not found');
     
     // Add to blocked list
-    blockedList.push(userToBlock);
-    localStorage.setItem(`blocked_users_${blockerId}`, JSON.stringify(blockedList));
+    blocked.push(userToBlock);
+    localStorage.setItem(`blocked_users_${blockerId}`, JSON.stringify(blocked));
     
     // Also unfollow if following
     await this.unfollowUser(blockerId, blockedId);
@@ -191,7 +432,6 @@ async updateNotificationPreferences(userId, preferences) {
   },
 
   async unblockUser(blockerId, blockedId) {
-    await delay(200);
     const blocked = await this.getBlockedUsers(blockerId);
     const updatedList = blocked.filter(user => user.Id !== blockedId);
     localStorage.setItem(`blocked_users_${blockerId}`, JSON.stringify(updatedList));
@@ -199,13 +439,11 @@ async updateNotificationPreferences(userId, preferences) {
   },
 
   async getBlockedUsers(userId) {
-    await delay(100);
     const saved = localStorage.getItem(`blocked_users_${userId}`);
     return saved ? JSON.parse(saved) : [];
   },
 
   async isBlocked(userId, targetUserId) {
-    await delay(100);
     const [blockedByUser, blockedByTarget] = await Promise.all([
       this.getBlockedUsers(userId),
       this.getBlockedUsers(targetUserId)

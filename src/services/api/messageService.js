@@ -1,129 +1,214 @@
-import conversationsData from '@/services/mockData/conversations.json';
+import { toast } from 'react-toastify';
 import { userService } from '@/services/api/userService';
-
-const mockConversations = [...conversationsData];
-const mockMessages = {};
-
-// Initialize some sample messages for conversations
-mockConversations.forEach(conv => {
-  mockMessages[conv.Id] = [
-    {
-      Id: conv.Id * 100 + 1,
-      content: conv.lastMessage.content,
-      senderId: conv.lastMessage.senderId,
-      timestamp: conv.lastMessage.timestamp,
-      isRead: conv.lastMessage.isRead
-    }
-  ];
-});
-
-let nextMessageId = 1000;
-
-const generateMessageId = () => {
-  return ++nextMessageId;
-};
 
 export const messageService = {
   async getConversations() {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return [...mockConversations];
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { 
+            field: { name: "participant_1_id" },
+            referenceField: { field: { Name: "display_name" } }
+          },
+          { 
+            field: { name: "participant_2_id" },
+            referenceField: { field: { Name: "display_name" } }
+          },
+          { field: { Name: "last_message_content" } },
+          { field: { Name: "last_message_sender_id" } },
+          { field: { Name: "last_message_timestamp" } },
+          { field: { Name: "last_message_is_read" } },
+          { field: { Name: "unread_count" } },
+          { field: { Name: "updated_at" } }
+        ],
+        orderBy: [{
+          fieldName: "updated_at",
+          sorttype: "DESC"
+        }]
+      };
+
+      const response = await apperClient.fetchRecords('conversation', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching conversations:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async getMessages(userId) {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Find conversation with this user
-    const conversation = mockConversations.find(conv => 
-      conv.participants.some(p => p.Id === userId)
-    );
-    
-    if (!conversation) {
+    try {
+      // Find conversation with this user first
+      const conversations = await this.getConversations();
+      const conversation = conversations.find(conv => 
+        conv.participant_1_id === userId || conv.participant_2_id === userId
+      );
+      
+      if (!conversation) {
+        return [];
+      }
+
+      // For now, return basic message structure based on conversation data
+      // In a full implementation, this would query a separate messages table
+      return [{
+        Id: 1,
+        content: conversation.last_message_content || '',
+        senderId: conversation.last_message_sender_id || userId,
+        timestamp: conversation.last_message_timestamp || new Date().toISOString(),
+        isRead: conversation.last_message_is_read || false
+      }];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching messages:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
       return [];
     }
-    
-    return mockMessages[conversation.Id] || [];
   },
 
   async createConversation(userId) {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Check if conversation already exists
-    const existingConversation = mockConversations.find(conv => 
-      conv.participants.some(p => p.Id === userId)
-    );
-    
-    if (existingConversation) {
-      return existingConversation;
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      // Check if conversation already exists
+      const existingConversations = await this.getConversations();
+      const existingConversation = existingConversations.find(conv => 
+        conv.participant_1_id === userId || conv.participant_2_id === userId
+      );
+      
+      if (existingConversation) {
+        return existingConversation;
+      }
+
+      const currentUserId = 1; // Assuming current user ID is 1
+      const params = {
+        records: [{
+          Name: `Conversation with ${userId}`,
+          participant_1_id: currentUserId,
+          participant_2_id: userId,
+          last_message_content: "Say hello to start the conversation!",
+          last_message_sender_id: currentUserId,
+          last_message_timestamp: new Date().toISOString(),
+          last_message_is_read: false,
+          unread_count: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }]
+      };
+
+      const response = await apperClient.createRecord('conversation', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+
+      if (response.results && response.results.length > 0) {
+        const successfulRecords = response.results.filter(result => result.success);
+        if (successfulRecords.length > 0) {
+          return successfulRecords[0].data;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating conversation:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
     }
-    
-    // Get user info
-    const otherUser = await userService.getById(userId);
-    const currentUser = await userService.getById(1); // Assuming current user ID is 1
-    
-    const newConversation = {
-      Id: mockConversations.length + 1,
-      participants: [currentUser, otherUser],
-      lastMessage: {
-        Id: generateMessageId(),
-        content: "Say hello to start the conversation!",
-        senderId: 1,
-        timestamp: new Date().toISOString(),
-        isRead: false
-      },
-      unreadCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    mockConversations.unshift(newConversation);
-    mockMessages[newConversation.Id] = [];
-    
-    return { ...newConversation };
   },
 
   async sendMessage(userId, content) {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Find or create conversation
-    let conversation = mockConversations.find(conv => 
-      conv.participants.some(p => p.Id === userId)
-    );
-    
-    if (!conversation) {
-      conversation = await this.createConversation(userId);
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      // Find or create conversation
+      let conversation = null;
+      const conversations = await this.getConversations();
+      conversation = conversations.find(conv => 
+        conv.participant_1_id === userId || conv.participant_2_id === userId
+      );
+      
+      if (!conversation) {
+        conversation = await this.createConversation(userId);
+        if (!conversation) {
+          throw new Error('Failed to create conversation');
+        }
+      }
+
+      const currentUserId = 1; // Assuming current user ID is 1
+      
+      // Update conversation with new message
+      const updateParams = {
+        records: [{
+          Id: conversation.Id,
+          last_message_content: content,
+          last_message_sender_id: currentUserId,
+          last_message_timestamp: new Date().toISOString(),
+          last_message_is_read: false,
+          updated_at: new Date().toISOString()
+        }]
+      };
+
+      const response = await apperClient.updateRecord('conversation', updateParams);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+
+      // Return mock message object
+      const newMessage = {
+        Id: Date.now(),
+        content,
+        senderId: currentUserId,
+        timestamp: new Date().toISOString(),
+        isRead: false
+      };
+
+      return newMessage;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error sending message:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      toast.error('Failed to send message');
+      return null;
     }
-    
-    const newMessage = {
-      Id: generateMessageId(),
-      content,
-      senderId: 1, // Assuming current user ID is 1
-      timestamp: new Date().toISOString(),
-      isRead: false
-    };
-    
-    // Add message to conversation
-    if (!mockMessages[conversation.Id]) {
-      mockMessages[conversation.Id] = [];
-    }
-    mockMessages[conversation.Id].push(newMessage);
-    
-    // Update conversation's last message
-    conversation.lastMessage = { ...newMessage };
-    conversation.updatedAt = new Date().toISOString();
-    
-    // Move conversation to top
-    const index = mockConversations.findIndex(c => c.Id === conversation.Id);
-    if (index > 0) {
-      mockConversations.splice(index, 1);
-      mockConversations.unshift(conversation);
-    }
-    
-    return { ...newMessage };
   },
 
   async sendAutoReply(userId) {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
     const autoReplies = [
       "Thanks for your message! I'll get back to you soon.",
       "Hey! How's it going?",
@@ -139,27 +224,58 @@ export const messageService = {
     
     const randomReply = autoReplies[Math.floor(Math.random() * autoReplies.length)];
     
-    const conversation = mockConversations.find(conv => 
-      conv.participants.some(p => p.Id === userId)
-    );
-    
-    if (!conversation) return null;
-    
-    const autoMessage = {
-      Id: generateMessageId(),
-      content: randomReply,
-      senderId: userId,
-      timestamp: new Date().toISOString(),
-      isRead: false
-    };
-    
-    mockMessages[conversation.Id].push(autoMessage);
-    
-    // Update conversation's last message
-    conversation.lastMessage = { ...autoMessage };
-    conversation.updatedAt = new Date().toISOString();
-    conversation.unreadCount = (conversation.unreadCount || 0) + 1;
-    
-    return { ...autoMessage };
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      // Find conversation
+      const conversations = await this.getConversations();
+      const conversation = conversations.find(conv => 
+        conv.participant_1_id === userId || conv.participant_2_id === userId
+      );
+      
+      if (!conversation) return null;
+
+      // Update conversation with auto reply
+      const updateParams = {
+        records: [{
+          Id: conversation.Id,
+          last_message_content: randomReply,
+          last_message_sender_id: userId,
+          last_message_timestamp: new Date().toISOString(),
+          last_message_is_read: false,
+          unread_count: (conversation.unread_count || 0) + 1,
+          updated_at: new Date().toISOString()
+        }]
+      };
+
+      const response = await apperClient.updateRecord('conversation', updateParams);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+
+      // Return mock auto message
+      const autoMessage = {
+        Id: Date.now(),
+        content: randomReply,
+        senderId: userId,
+        timestamp: new Date().toISOString(),
+        isRead: false
+      };
+
+      return autoMessage;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error sending auto reply:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
+    }
   }
 };

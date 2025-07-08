@@ -1,167 +1,540 @@
-import postData from '../mockData/posts.json';
-import userData from '../mockData/users.json';
-import followData from '../mockData/follows.json';
+import { toast } from 'react-toastify';
 import { notificationService } from './notificationService';
-let posts = [...postData];
-let users = [...userData];
-let follows = [...followData];
-
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+import { userService } from './userService';
 
 export const postService = {
   async getAll() {
-    await delay(400);
-    return posts
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-      .map(post => {
-        const author = users.find(u => u.Id === post.authorId);
-        return {
-          ...post,
-          author: author || null
-        };
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "content" } },
+          { field: { Name: "media_urls" } },
+          { field: { Name: "likes" } },
+          { field: { Name: "comments" } },
+          { field: { Name: "timestamp" } },
+          { field: { Name: "hashtags" } },
+          { 
+            field: { name: "author_id" },
+            referenceField: { field: { Name: "display_name" } }
+          }
+        ],
+        orderBy: [{
+          fieldName: "timestamp",
+          sorttype: "DESC"
+        }]
+      };
+
+      const response = await apperClient.fetchRecords('post', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching posts:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async getById(id) {
-    await delay(200);
-    const post = posts.find(p => p.Id === id);
-    if (!post) return null;
-    
-    const author = users.find(u => u.Id === post.authorId);
-    return {
-      ...post,
-      author: author || null
-    };
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "content" } },
+          { field: { Name: "media_urls" } },
+          { field: { Name: "likes" } },
+          { field: { Name: "comments" } },
+          { field: { Name: "timestamp" } },
+          { field: { Name: "hashtags" } },
+          { 
+            field: { name: "author_id" },
+            referenceField: { field: { Name: "display_name" } }
+          }
+        ]
+      };
+
+      const response = await apperClient.getRecordById('post', id, params);
+      
+      if (!response || !response.data) {
+        return null;
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching post with ID ${id}:`, error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
+    }
   },
 
   async getByUserId(userId) {
-    await delay(300);
-    const userPosts = posts.filter(p => p.authorId === userId);
-    return userPosts
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-      .map(post => {
-        const author = users.find(u => u.Id === post.authorId);
-        return {
-          ...post,
-          author: author || null
-        };
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "content" } },
+          { field: { Name: "media_urls" } },
+          { field: { Name: "likes" } },
+          { field: { Name: "comments" } },
+          { field: { Name: "timestamp" } },
+          { field: { Name: "hashtags" } },
+          { 
+            field: { name: "author_id" },
+            referenceField: { field: { Name: "display_name" } }
+          }
+        ],
+        where: [{
+          FieldName: "author_id",
+          Operator: "EqualTo",
+          Values: [userId]
+        }],
+        orderBy: [{
+          fieldName: "timestamp",
+          sorttype: "DESC"
+        }]
+      };
+
+      const response = await apperClient.fetchRecords('post', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching user posts:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async getFeed(userId) {
-    await delay(350);
-    const userFollows = follows.filter(f => f.followerId === userId);
-    const followingIds = userFollows.map(f => f.followingId);
-    
-    // Include user's own posts and posts from followed users
-    const feedPosts = posts.filter(p => 
-      followingIds.includes(p.authorId) || p.authorId === userId
-    );
-    
-    return feedPosts
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-      .map(post => {
-        const author = users.find(u => u.Id === post.authorId);
-        return {
-          ...post,
-          author: author || null
-        };
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       });
+
+      // Get following list first
+      const followParams = {
+        fields: [{ field: { Name: "following_id" } }],
+        where: [{
+          FieldName: "follower_id",
+          Operator: "EqualTo",
+          Values: [userId]
+        }]
+      };
+
+      const followResponse = await apperClient.fetchRecords('follow', followParams);
+      const followingIds = [userId]; // Include own posts
+      
+      if (followResponse.success && followResponse.data) {
+        followResponse.data.forEach(follow => {
+          if (follow.following_id) {
+            followingIds.push(follow.following_id);
+          }
+        });
+      }
+
+      // Get posts from followed users
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "content" } },
+          { field: { Name: "media_urls" } },
+          { field: { Name: "likes" } },
+          { field: { Name: "comments" } },
+          { field: { Name: "timestamp" } },
+          { field: { Name: "hashtags" } },
+          { 
+            field: { name: "author_id" },
+            referenceField: { field: { Name: "display_name" } }
+          }
+        ],
+        where: [{
+          FieldName: "author_id",
+          Operator: "ExactMatch",
+          Values: followingIds,
+          Include: true
+        }],
+        orderBy: [{
+          fieldName: "timestamp",
+          sorttype: "DESC"
+        }]
+      };
+
+      const response = await apperClient.fetchRecords('post', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching feed:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async getTrending() {
-    await delay(300);
-    return posts
-      .sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments))
-      .slice(0, 10)
-      .map(post => {
-        const author = users.find(u => u.Id === post.authorId);
-        return {
-          ...post,
-          author: author || null
-        };
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "content" } },
+          { field: { Name: "media_urls" } },
+          { field: { Name: "likes" } },
+          { field: { Name: "comments" } },
+          { field: { Name: "timestamp" } },
+          { field: { Name: "hashtags" } },
+          { 
+            field: { name: "author_id" },
+            referenceField: { field: { Name: "display_name" } }
+          }
+        ],
+        orderBy: [{
+          fieldName: "likes",
+          sorttype: "DESC"
+        }],
+        pagingInfo: {
+          limit: 10,
+          offset: 0
+        }
+      };
+
+      const response = await apperClient.fetchRecords('post', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching trending posts:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async create(postData) {
-    await delay(300);
-    const newPost = {
-      Id: Math.max(...posts.map(p => p.Id)) + 1,
-      ...postData,
-      likes: 0,
-      comments: 0,
-      timestamp: new Date().toISOString()
-    };
-    
-    posts.unshift(newPost);
-    
-    const author = users.find(u => u.Id === newPost.authorId);
-    return {
-      ...newPost,
-      author: author || null
-    };
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        records: [{
+          Name: postData.content?.substring(0, 50) || 'New Post',
+          content: postData.content,
+          media_urls: postData.mediaUrls?.join(',') || '',
+          likes: 0,
+          comments: 0,
+          timestamp: new Date().toISOString(),
+          hashtags: postData.hashtags?.join(',') || '',
+          author_id: postData.authorId
+        }]
+      };
+
+      const response = await apperClient.createRecord('post', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success);
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create ${failedRecords.length} posts:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) toast.error(record.message);
+          });
+        }
+        
+        if (successfulRecords.length > 0) {
+          toast.success('Post created successfully!');
+          return successfulRecords[0].data;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating post:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      toast.error('Failed to create post');
+      return null;
+    }
   },
 
-async like(postId, userId) {
-    await delay(200);
-    const post = posts.find(p => p.Id === postId);
-    if (post) {
-      post.likes += 1;
+  async like(postId, userId) {
+    try {
+      // Get current post to increment likes
+      const post = await this.getById(postId);
+      if (!post) return 0;
+
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const newLikes = (post.likes || 0) + 1;
       
+      const params = {
+        records: [{
+          Id: postId,
+          likes: newLikes
+        }]
+      };
+
+      const response = await apperClient.updateRecord('post', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return post.likes || 0;
+      }
+
       // Send notification to post author
-      if (post.authorId !== userId) {
-        const liker = users.find(u => u.Id === userId);
+      if (post.author_id && post.author_id !== userId) {
+        const liker = await userService.getById(userId);
         if (liker) {
-          notificationService.sendNotification(post.authorId, {
+          notificationService.sendNotification(post.author_id, {
             type: 'like',
-            message: `${liker.displayName} liked your post`,
+            message: `${liker.display_name} liked your post`,
             userId: userId,
             postId: postId
           });
         }
       }
-      
-      return post.likes;
+
+      return newLikes;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error liking post:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return 0;
     }
-    return 0;
   },
 
   async unlike(postId, userId) {
-    await delay(200);
-    const post = posts.find(p => p.Id === postId);
-    if (post && post.likes > 0) {
-      post.likes -= 1;
-      return post.likes;
+    try {
+      // Get current post to decrement likes
+      const post = await this.getById(postId);
+      if (!post) return 0;
+
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const newLikes = Math.max((post.likes || 0) - 1, 0);
+      
+      const params = {
+        records: [{
+          Id: postId,
+          likes: newLikes
+        }]
+      };
+
+      const response = await apperClient.updateRecord('post', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return post.likes || 0;
+      }
+
+      return newLikes;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error unliking post:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return 0;
     }
-    return 0;
   },
 
   async searchPosts(query) {
-    await delay(250);
-    const lowerQuery = query.toLowerCase();
-    return posts
-      .filter(post => 
-        post.content.toLowerCase().includes(lowerQuery) ||
-        post.hashtags.some(tag => tag.toLowerCase().includes(lowerQuery))
-      )
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-      .slice(0, 20)
-      .map(post => {
-        const author = users.find(u => u.Id === post.authorId);
-        return {
-          ...post,
-          author: author || null
-        };
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "content" } },
+          { field: { Name: "media_urls" } },
+          { field: { Name: "likes" } },
+          { field: { Name: "comments" } },
+          { field: { Name: "timestamp" } },
+          { field: { Name: "hashtags" } },
+          { 
+            field: { name: "author_id" },
+            referenceField: { field: { Name: "display_name" } }
+          }
+        ],
+        whereGroups: [{
+          operator: "OR",
+          subGroups: [
+            {
+              conditions: [{
+                fieldName: "content",
+                operator: "Contains",
+                values: [query]
+              }],
+              operator: "OR"
+            },
+            {
+              conditions: [{
+                fieldName: "hashtags",
+                operator: "Contains",
+                values: [query]
+              }],
+              operator: "OR"
+            }
+          ]
+        }],
+        orderBy: [{
+          fieldName: "timestamp",
+          sorttype: "DESC"
+        }],
+        pagingInfo: {
+          limit: 20,
+          offset: 0
+        }
+      };
+
+      const response = await apperClient.fetchRecords('post', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error searching posts:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async delete(id) {
-    await delay(200);
-    const index = posts.findIndex(p => p.Id === id);
-    if (index !== -1) {
-      posts.splice(index, 1);
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        RecordIds: [id]
+      };
+
+      const response = await apperClient.deleteRecord('post', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return false;
+      }
+
+      if (response.results) {
+        const failedDeletions = response.results.filter(result => !result.success);
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete ${failedDeletions.length} posts:${JSON.stringify(failedDeletions)}`);
+          
+          failedDeletions.forEach(record => {
+            if (record.message) toast.error(record.message);
+          });
+          return false;
+        }
+        
+        toast.success('Post deleted successfully!');
+        return true;
+      }
+
       return true;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting post:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      toast.error('Failed to delete post');
+      return false;
     }
-    return false;
   }
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useSelector } from 'react-redux';
 import ApperIcon from '@/components/ApperIcon';
 import Avatar from '@/components/atoms/Avatar';
 import Button from '@/components/atoms/Button';
@@ -17,9 +18,10 @@ const CreatePostForm = ({ onSubmit, onCancel, className }) => {
 
 setIsSubmitting(true);
     try {
+      const { user } = useSelector((state) => state.user);
       await onSubmit({
         content: content.trim(),
-        authorId: 1, // Current user ID
+        authorId: user?.userId || 1, // Use actual user ID from Redux
         mediaUrls: selectedMedia.map(file => file.url),
         hashtags: extractHashtags(content)
       });
@@ -59,12 +61,12 @@ setIsSubmitting(true);
       className={cn('bg-white rounded-xl border border-gray-200 shadow-card p-4', className)}
     >
       <form onSubmit={handleSubmit}>
-        <div className="flex gap-3">
+<div className="flex gap-3">
           <Avatar
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+            src={useSelector((state) => state.user?.user?.profilePicture) || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"}
             alt="Your avatar"
             size="md"
-            fallback="You"
+            fallback={useSelector((state) => state.user?.user?.firstName?.[0]) || "U"}
           />
           <div className="flex-1">
             <Textarea
