@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import ApperIcon from '@/components/ApperIcon';
-import { Button } from '@/components/atoms/Button';
+import Button from '@/components/atoms/Button';
 import { Textarea } from '@/components/atoms/Textarea';
 import { Avatar } from '@/components/atoms/Avatar';
 import Loading from '@/components/ui/Loading';
