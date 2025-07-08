@@ -1,0 +1,82 @@
+[
+  {
+    "Id": 1,
+    "postId": 1,
+    "authorId": 2,
+    "content": "Wow! That view is absolutely stunning! 😍",
+    "timestamp": "2024-01-15T10:45:00Z",
+    "parentId": null
+  },
+  {
+    "Id": 2,
+    "postId": 1,
+    "authorId": 3,
+    "content": "I need to visit this place! Where exactly is this?",
+    "timestamp": "2024-01-15T11:10:00Z",
+    "parentId": null
+  },
+  {
+    "Id": 3,
+    "postId": 1,
+    "authorId": 1,
+    "content": "It's in the Rocky Mountains, about 2 hours from Denver!",
+    "timestamp": "2024-01-15T11:30:00Z",
+    "parentId": 2
+  },
+  {
+    "Id": 4,
+    "postId": 2,
+    "authorId": 4,
+    "content": "The perfect combo indeed! What IDE are you using?",
+    "timestamp": "2024-01-15T09:15:00Z",
+    "parentId": null
+  },
+  {
+    "Id": 5,
+    "postId": 2,
+    "authorId": 2,
+    "content": "VS Code with the Material Theme! Love the clean interface.",
+    "timestamp": "2024-01-15T09:30:00Z",
+    "parentId": 4
+  },
+  {
+    "Id": 6,
+    "postId": 3,
+    "authorId": 5,
+    "content": "This design looks amazing! Very clean and modern 🔥",
+    "timestamp": "2024-01-14T16:45:00Z",
+    "parentId": null
+  },
+  {
+    "Id": 7,
+    "postId": 3,
+    "authorId": 6,
+    "content": "Love the color scheme! Is this for a mobile app?",
+    "timestamp": "2024-01-14T17:20:00Z",
+    "parentId": null
+  },
+  {
+    "Id": 8,
+    "postId": 4,
+    "authorId": 7,
+    "content": "You're an inspiration! Keep pushing those limits 💪",
+    "timestamp": "2024-01-14T14:30:00Z",
+    "parentId": null
+  },
+  {
+    "Id": 9,
+    "postId": 5,
+    "authorId": 8,
+    "content": "That looks absolutely delicious! 🤤",
+    "timestamp": "2024-01-14T13:00:00Z",
+    "parentId": null
+  },
+  {
+    "Id": 10,
+    "postId": 5,
+    "authorId": 1,
+    "content": "I'm so jealous! Tokyo food scene is incredible.",
+    "timestamp": "2024-01-14T13:15:00Z",
+    "parentId": null
+  }
+]

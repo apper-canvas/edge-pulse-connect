@@ -1,0 +1,90 @@
+[
+  {
+    "Id": 1,
+    "username": "sarah_chen",
+    "displayName": "Sarah Chen",
+    "avatar": "https://images.unsplash.com/photo-1494790108755-2616b9c9e14a?w=150&h=150&fit=crop&crop=face",
+    "bio": "Digital nomad 🌍 | Coffee enthusiast ☕ | Capturing life's moments 📸",
+    "followersCount": 1247,
+    "followingCount": 892,
+    "postsCount": 156,
+    "isPrivate": false
+  },
+  {
+    "Id": 2,
+    "username": "mike_adventures",
+    "displayName": "Mike Rodriguez",
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    "bio": "Adventure seeker 🏔️ | Mountain climber | Living life to the fullest",
+    "followersCount": 2341,
+    "followingCount": 567,
+    "postsCount": 89,
+    "isPrivate": false
+  },
+  {
+    "Id": 3,
+    "username": "emma_creates",
+    "displayName": "Emma Johnson",
+    "avatar": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    "bio": "UI/UX Designer ✨ | Creating beautiful digital experiences | Design lover",
+    "followersCount": 3456,
+    "followingCount": 1234,
+    "postsCount": 234,
+    "isPrivate": false
+  },
+  {
+    "Id": 4,
+    "username": "alex_fitness",
+    "displayName": "Alex Thompson",
+    "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    "bio": "Fitness coach 💪 | Helping people achieve their goals | Gym enthusiast",
+    "followersCount": 5678,
+    "followingCount": 432,
+    "postsCount": 312,
+    "isPrivate": false
+  },
+  {
+    "Id": 5,
+    "username": "lisa_foodie",
+    "displayName": "Lisa Wang",
+    "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+    "bio": "Food blogger 🍜 | Exploring flavors around the world | Culinary adventures",
+    "followersCount": 4321,
+    "followingCount": 876,
+    "postsCount": 198,
+    "isPrivate": false
+  },
+  {
+    "Id": 6,
+    "username": "david_tech",
+    "displayName": "David Kim",
+    "avatar": "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=150&h=150&fit=crop&crop=face",
+    "bio": "Software engineer 👨‍💻 | Tech enthusiast | Building the future",
+    "followersCount": 2876,
+    "followingCount": 1543,
+    "postsCount": 145,
+    "isPrivate": false
+  },
+  {
+    "Id": 7,
+    "username": "maria_artist",
+    "displayName": "Maria Garcia",
+    "avatar": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
+    "bio": "Visual artist 🎨 | Painting emotions | Gallery exhibitions worldwide",
+    "followersCount": 1987,
+    "followingCount": 654,
+    "postsCount": 87,
+    "isPrivate": false
+  },
+  {
+    "Id": 8,
+    "username": "james_music",
+    "displayName": "James Wilson",
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+    "bio": "Musician 🎵 | Indie rock | Spreading good vibes through music",
+    "followersCount": 3214,
+    "followingCount": 987,
+    "postsCount": 201,
+    "isPrivate": false
+  }
+]

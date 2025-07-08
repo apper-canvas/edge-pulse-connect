@@ -1,0 +1,102 @@
+[
+  {
+    "Id": 1,
+    "authorId": 1,
+    "content": "Just finished an amazing hike in the mountains! The view was absolutely breathtaking 🏔️ #hiking #nature #mountains",
+    "mediaUrls": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop"],
+    "likes": 127,
+    "comments": 23,
+    "timestamp": "2024-01-15T10:30:00Z",
+    "hashtags": ["hiking", "nature", "mountains"]
+  },
+  {
+    "Id": 2,
+    "authorId": 2,
+    "content": "Coffee and code - the perfect combination for a productive Monday morning! ☕️💻 #coding #coffee #productivity",
+    "mediaUrls": ["https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&h=400&fit=crop"],
+    "likes": 89,
+    "comments": 15,
+    "timestamp": "2024-01-15T08:45:00Z",
+    "hashtags": ["coding", "coffee", "productivity"]
+  },
+  {
+    "Id": 3,
+    "authorId": 3,
+    "content": "Working on some new UI designs for an upcoming project. Love how clean and minimal this interface looks! ✨ #design #ui #minimal",
+    "mediaUrls": ["https://images.unsplash.com/photo-1541462608143-67571c6738dd?w=600&h=400&fit=crop"],
+    "likes": 234,
+    "comments": 41,
+    "timestamp": "2024-01-14T16:20:00Z",
+    "hashtags": ["design", "ui", "minimal"]
+  },
+  {
+    "Id": 4,
+    "authorId": 4,
+    "content": "Leg day complete! 💪 Remember, consistency is key. Every workout brings you closer to your goals. #fitness #legday #motivation",
+    "mediaUrls": ["https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop"],
+    "likes": 156,
+    "comments": 28,
+    "timestamp": "2024-01-14T14:15:00Z",
+    "hashtags": ["fitness", "legday", "motivation"]
+  },
+  {
+    "Id": 5,
+    "authorId": 5,
+    "content": "Tried this amazing ramen place in Tokyo! The broth was so rich and flavorful 🍜 Can't wait to share the recipe! #ramen #tokyo #foodie",
+    "mediaUrls": ["https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=600&h=400&fit=crop"],
+    "likes": 298,
+    "comments": 67,
+    "timestamp": "2024-01-14T12:30:00Z",
+    "hashtags": ["ramen", "tokyo", "foodie"]
+  },
+  {
+    "Id": 6,
+    "authorId": 6,
+    "content": "Just deployed a new feature to production! The feeling of seeing your code work perfectly is unmatched 🚀 #programming #deployment #success",
+    "mediaUrls": [],
+    "likes": 78,
+    "comments": 12,
+    "timestamp": "2024-01-14T09:45:00Z",
+    "hashtags": ["programming", "deployment", "success"]
+  },
+  {
+    "Id": 7,
+    "authorId": 7,
+    "content": "Finished my latest painting today! This sunset piece took me 3 weeks to complete. Art is about patience and passion 🎨 #art #painting #sunset",
+    "mediaUrls": ["https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&h=400&fit=crop"],
+    "likes": 189,
+    "comments": 34,
+    "timestamp": "2024-01-13T20:10:00Z",
+    "hashtags": ["art", "painting", "sunset"]
+  },
+  {
+    "Id": 8,
+    "authorId": 8,
+    "content": "Recording session for our new album was incredible! Can't wait for everyone to hear what we've been working on 🎵 #music #recording #newalbum",
+    "mediaUrls": ["https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=400&fit=crop"],
+    "likes": 267,
+    "comments": 56,
+    "timestamp": "2024-01-13T18:25:00Z",
+    "hashtags": ["music", "recording", "newalbum"]
+  },
+  {
+    "Id": 9,
+    "authorId": 1,
+    "content": "Sometimes the best moments are the simple ones - a good book and a cup of tea on a rainy afternoon 📚☕ #reading #cozy #simple",
+    "mediaUrls": ["https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop"],
+    "likes": 145,
+    "comments": 19,
+    "timestamp": "2024-01-13T15:40:00Z",
+    "hashtags": ["reading", "cozy", "simple"]
+  },
+  {
+    "Id": 10,
+    "authorId": 3,
+    "content": "Color theory is fascinating! How different combinations can evoke completely different emotions. Today's mood: vibrant and energetic! 🌈 #colortheory #design #vibrant",
+    "mediaUrls": ["https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=600&h=400&fit=crop"],
+    "likes": 201,
+    "comments": 37,
+    "timestamp": "2024-01-13T11:20:00Z",
+    "hashtags": ["colortheory", "design", "vibrant"]
+  }
+]
