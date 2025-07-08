@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Router, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Navigation from "@/components/organisms/Navigation";
 import Profile from "@/components/pages/Profile";
@@ -11,11 +11,10 @@ import Home from "@/components/pages/Home";
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <div className="min-h-screen bg-background">
         <Navigation />
-        
-<main className="mobile-padding">
+        <main className="mobile-padding">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/explore" element={<Explore />} />
@@ -39,10 +38,9 @@ function App() {
           draggable
           pauseOnHover
           theme="colored"
-        />
+/>
       </div>
-    </Router>
+    </BrowserRouter>
   );
 }
-
 export default App;
