@@ -1,7 +1,7 @@
 import postData from '../mockData/posts.json';
 import userData from '../mockData/users.json';
 import followData from '../mockData/follows.json';
-
+import { notificationService } from './notificationService';
 let posts = [...postData];
 let users = [...userData];
 let follows = [...followData];
@@ -102,11 +102,25 @@ export const postService = {
     };
   },
 
-  async like(postId, userId) {
+async like(postId, userId) {
     await delay(200);
     const post = posts.find(p => p.Id === postId);
     if (post) {
       post.likes += 1;
+      
+      // Send notification to post author
+      if (post.authorId !== userId) {
+        const liker = users.find(u => u.Id === userId);
+        if (liker) {
+          notificationService.sendNotification(post.authorId, {
+            type: 'like',
+            message: `${liker.displayName} liked your post`,
+            userId: userId,
+            postId: postId
+          });
+        }
+      }
+      
       return post.likes;
     }
     return 0;

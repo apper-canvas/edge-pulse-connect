@@ -31,6 +31,7 @@ const navItems = [
     { icon: 'Compass', label: 'Explore', path: '/explore' },
     { icon: 'MessageCircle', label: 'Messages', path: '/messages' },
     { icon: 'Bell', label: 'Notifications', path: '/notifications' },
+    { icon: 'Settings', label: 'Settings', path: '/settings' },
     { icon: 'User', label: 'Profile', path: '/profile/1' },
   ];
 

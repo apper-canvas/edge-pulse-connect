@@ -1,6 +1,6 @@
 import commentData from '../mockData/comments.json';
 import userData from '../mockData/users.json';
-
+import { notificationService } from './notificationService';
 let comments = [...commentData];
 let users = [...userData];
 
@@ -33,6 +33,17 @@ async create(commentData) {
     comments.push(newComment);
     
     const author = users.find(u => u.Id === newComment.authorId);
+    
+    // Send notification to post author (if different from commenter)
+    if (author && commentData.authorId !== commentData.postAuthorId) {
+      notificationService.sendNotification(commentData.postAuthorId, {
+        type: 'comment',
+        message: `${author.displayName} commented on your post`,
+        userId: commentData.authorId,
+        postId: commentData.postId
+      });
+    }
+    
     return {
       ...newComment,
       author: author || null

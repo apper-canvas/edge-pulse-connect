@@ -111,7 +111,25 @@ export const userService = {
   async isFollowing(followerId, followingId) {
     await delay(100);
     return follows.some(f => 
-      f.followerId === followerId && f.followingId === followingId
+f.followerId === followerId && f.followingId === followingId
     );
+  },
+
+  async getNotificationPreferences(userId) {
+    await delay(100);
+    const saved = localStorage.getItem(`notification_prefs_${userId}`);
+    return saved ? JSON.parse(saved) : {
+      likes: true,
+      comments: true,
+      follows: true,
+      messages: true,
+      pushEnabled: false
+    };
+  },
+
+  async updateNotificationPreferences(userId, preferences) {
+    await delay(100);
+    localStorage.setItem(`notification_prefs_${userId}`, JSON.stringify(preferences));
+    return preferences;
   }
 };
