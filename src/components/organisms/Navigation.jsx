@@ -26,9 +26,10 @@ const Navigation = () => {
     window.location.href = `/profile/${user.Id}`;
   };
 
-  const navItems = [
+const navItems = [
     { icon: 'Home', label: 'Home', path: '/' },
     { icon: 'Compass', label: 'Explore', path: '/explore' },
+    { icon: 'MessageCircle', label: 'Messages', path: '/messages' },
     { icon: 'Bell', label: 'Notifications', path: '/notifications' },
     { icon: 'User', label: 'Profile', path: '/profile/1' },
   ];

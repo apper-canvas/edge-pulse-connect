@@ -66,7 +66,7 @@ const UserCard = ({ user, onFollow, onUnfollow, isFollowing: initialFollowing = 
           </div>
         </Link>
 
-        <div className="flex flex-col gap-2">
+<div className="flex flex-col gap-2">
           <Button
             variant={isFollowing ? "outline" : "primary"}
             size="sm"
@@ -79,6 +79,16 @@ const UserCard = ({ user, onFollow, onUnfollow, isFollowing: initialFollowing = 
             ) : (
               isFollowing ? 'Following' : 'Follow'
             )}
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => window.location.href = `/chat/${user.Id}`}
+            className="min-w-[80px]"
+          >
+            <ApperIcon name="MessageCircle" size={16} />
+            Message
           </Button>
         </div>
       </div>

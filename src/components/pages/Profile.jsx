@@ -187,25 +187,36 @@ const Profile = () => {
             </div>
           </div>
           
-          <div className="flex flex-col gap-2">
+<div className="flex flex-col gap-2">
             {!isOwnProfile && (
-              <Button
-                variant={isFollowing ? "outline" : "primary"}
-                onClick={handleFollow}
-                className="min-w-[120px]"
-              >
-                {isFollowing ? (
-                  <>
-                    <ApperIcon name="UserMinus" size={16} />
-                    Following
-                  </>
-                ) : (
-                  <>
-                    <ApperIcon name="UserPlus" size={16} />
-                    Follow
-                  </>
-                )}
-              </Button>
+              <>
+                <Button
+                  variant={isFollowing ? "outline" : "primary"}
+                  onClick={handleFollow}
+                  className="min-w-[120px]"
+                >
+                  {isFollowing ? (
+                    <>
+                      <ApperIcon name="UserMinus" size={16} />
+                      Following
+                    </>
+                  ) : (
+                    <>
+                      <ApperIcon name="UserPlus" size={16} />
+                      Follow
+                    </>
+                  )}
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.location.href = `/chat/${id}`}
+                  className="min-w-[120px]"
+                >
+                  <ApperIcon name="MessageCircle" size={16} />
+                  Message
+                </Button>
+              </>
             )}
             
             <Button variant="ghost" size="sm">
