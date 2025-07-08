@@ -18,8 +18,10 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('posts');
-
-  const loadUser = async () => {
+  const [privacySettings, setPrivacySettings] = useState(null);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [privacyLoading, setPrivacyLoading] = useState(false);
+const loadUser = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -35,6 +37,18 @@ const Profile = () => {
       // Check if current user is following this user
       const following = await userService.isFollowing(1, parseInt(id));
       setIsFollowing(following);
+      
+      // Check privacy settings and blocking status
+      if (parseInt(id) !== 1) {
+        setPrivacyLoading(true);
+        const [privacy, blocked] = await Promise.all([
+          userService.getPrivacySettings(parseInt(id)),
+          userService.isBlocked(1, parseInt(id))
+        ]);
+        setPrivacySettings(privacy);
+        setIsBlocked(blocked);
+        setPrivacyLoading(false);
+      }
     } catch (err) {
       setError(err.message || 'Failed to load user profile');
       console.error('Error loading user:', err);
@@ -68,7 +82,16 @@ const Profile = () => {
     }
   };
 
-  const isOwnProfile = parseInt(id) === 1; // Current user ID
+const isOwnProfile = parseInt(id) === 1; // Current user ID
+  
+  // Check if profile should be private
+  const shouldShowPrivateProfile = () => {
+    if (isOwnProfile) return false;
+    if (privacyLoading) return false;
+    if (isBlocked) return true;
+    if (privacySettings?.isPrivateProfile && !isFollowing) return true;
+    return false;
+  };
 
   if (loading) {
     return (
@@ -100,7 +123,24 @@ const Profile = () => {
     { id: 'following', label: 'Following', icon: 'UserPlus' }
   ];
 
-  const renderTabContent = () => {
+const renderTabContent = () => {
+    if (shouldShowPrivateProfile()) {
+      return (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-card p-8 text-center">
+          <ApperIcon name={isBlocked ? "UserX" : "Lock"} size={48} className="mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            {isBlocked ? "User Blocked" : "Private Profile"}
+          </h3>
+          <p className="text-gray-500">
+            {isBlocked 
+              ? "You have blocked this user or they have blocked you."
+              : "This user has a private profile. Follow them to see their content."
+            }
+          </p>
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case 'posts':
         return <PostList variant="user" userId={parseInt(id)} />;
@@ -188,7 +228,7 @@ const Profile = () => {
           </div>
           
 <div className="flex flex-col gap-2">
-            {!isOwnProfile && (
+            {!isOwnProfile && !isBlocked && (
               <>
                 <Button
                   variant={isFollowing ? "outline" : "primary"}
@@ -219,9 +259,25 @@ const Profile = () => {
               </>
             )}
             
-            <Button variant="ghost" size="sm">
-              <ApperIcon name="MoreHorizontal" size={16} />
-            </Button>
+            {isBlocked && (
+              <div className="text-center">
+                <p className="text-sm text-red-600 mb-2">User blocked</p>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="text-red-600 border-red-200"
+                >
+                  <ApperIcon name="UserX" size={16} />
+                  Blocked
+                </Button>
+              </div>
+            )}
+            
+            {!isBlocked && (
+              <Button variant="ghost" size="sm">
+                <ApperIcon name="MoreHorizontal" size={16} />
+              </Button>
+            )}
           </div>
         </div>
       </motion.div>

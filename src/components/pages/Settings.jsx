@@ -4,9 +4,9 @@ import { toast } from 'react-toastify';
 import ApperIcon from '@/components/ApperIcon';
 import Button from '@/components/atoms/Button';
 import Loading from '@/components/ui/Loading';
+import PrivacySettingsModal from '@/components/molecules/PrivacySettingsModal';
 import { userService } from '@/services/api/userService';
 import { notificationService } from '@/services/api/notificationService';
-
 const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -18,9 +18,9 @@ const Settings = () => {
     pushEnabled: false
   });
   const [permissionStatus, setPermissionStatus] = useState('default');
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   
   const currentUserId = 1; // This would come from auth context in real app
-
   useEffect(() => {
     const loadPreferences = async () => {
       try {
@@ -254,9 +254,49 @@ const Settings = () => {
               )}
             </Button>
           </div>
-        </div>
+</div>
       </motion.div>
 
+      {/* Privacy Settings Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+        className="bg-white rounded-xl border border-gray-200 shadow-card overflow-hidden"
+      >
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">
+            Privacy & Safety
+          </h2>
+          <p className="text-sm text-gray-600">
+            Control who can see and interact with your content
+          </p>
+        </div>
+
+        <div className="p-6">
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                <ApperIcon name="Shield" size={20} className="text-white" />
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">Privacy Settings</h3>
+                <p className="text-sm text-gray-600">
+                  Manage profile visibility, interactions, and blocked users
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setShowPrivacyModal(true)}
+              className="whitespace-nowrap"
+            >
+              <ApperIcon name="Settings" size={16} />
+              Configure
+            </Button>
+          </div>
+        </div>
+      </motion.div>
       {/* Browser Support Info */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -273,8 +313,14 @@ const Settings = () => {
               Your browser may ask for permission to show notifications.
             </p>
           </div>
-        </div>
+</div>
       </motion.div>
+
+      {/* Privacy Settings Modal */}
+      <PrivacySettingsModal
+        isOpen={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+      />
     </div>
   );
 };

@@ -127,9 +127,77 @@ f.followerId === followerId && f.followingId === followingId
     };
   },
 
-  async updateNotificationPreferences(userId, preferences) {
+async updateNotificationPreferences(userId, preferences) {
     await delay(100);
     localStorage.setItem(`notification_prefs_${userId}`, JSON.stringify(preferences));
     return preferences;
+  },
+
+  async getPrivacySettings(userId) {
+    await delay(100);
+    const saved = localStorage.getItem(`privacy_settings_${userId}`);
+    return saved ? JSON.parse(saved) : {
+      isPrivateProfile: false,
+      allowPostVisibility: 'everyone',
+      allowComments: 'everyone',
+      allowMessages: 'everyone',
+      showInSearch: true,
+      showOnlineStatus: true
+    };
+  },
+
+  async updatePrivacySettings(userId, settings) {
+    await delay(200);
+    localStorage.setItem(`privacy_settings_${userId}`, JSON.stringify(settings));
+    return settings;
+  },
+
+  async blockUser(blockerId, blockedId) {
+    await delay(200);
+    const blocked = this.getBlockedUsers(blockerId);
+    const blockedList = await blocked;
+    
+    // Check if already blocked
+    const isAlreadyBlocked = blockedList.some(user => user.Id === blockedId);
+    if (isAlreadyBlocked) return true;
+    
+    // Get user to block
+    const userToBlock = users.find(u => u.Id === blockedId);
+    if (!userToBlock) throw new Error('User not found');
+    
+    // Add to blocked list
+    blockedList.push(userToBlock);
+    localStorage.setItem(`blocked_users_${blockerId}`, JSON.stringify(blockedList));
+    
+    // Also unfollow if following
+    await this.unfollowUser(blockerId, blockedId);
+    await this.unfollowUser(blockedId, blockerId);
+    
+    return true;
+  },
+
+  async unblockUser(blockerId, blockedId) {
+    await delay(200);
+    const blocked = await this.getBlockedUsers(blockerId);
+    const updatedList = blocked.filter(user => user.Id !== blockedId);
+    localStorage.setItem(`blocked_users_${blockerId}`, JSON.stringify(updatedList));
+    return true;
+  },
+
+  async getBlockedUsers(userId) {
+    await delay(100);
+    const saved = localStorage.getItem(`blocked_users_${userId}`);
+    return saved ? JSON.parse(saved) : [];
+  },
+
+  async isBlocked(userId, targetUserId) {
+    await delay(100);
+    const [blockedByUser, blockedByTarget] = await Promise.all([
+      this.getBlockedUsers(userId),
+      this.getBlockedUsers(targetUserId)
+    ]);
+    
+    return blockedByUser.some(user => user.Id === targetUserId) || 
+           blockedByTarget.some(user => user.Id === userId);
   }
 };

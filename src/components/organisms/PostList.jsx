@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import PostCard from '@/components/molecules/PostCard';
-import Loading from '@/components/ui/Loading';
-import Error from '@/components/ui/Error';
-import Empty from '@/components/ui/Empty';
-import { postService } from '@/services/api/postService';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import Empty from "@/components/ui/Empty";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import PostCard from "@/components/molecules/PostCard";
+import commentsData from "@/services/mockData/comments.json";
+import postsData from "@/services/mockData/posts.json";
+import usersData from "@/services/mockData/users.json";
+import followsData from "@/services/mockData/follows.json";
+import { userService } from "@/services/api/userService";
+import { postService } from "@/services/api/postService";
 
 const PostList = ({ userId, variant = 'feed', className }) => {
   const [posts, setPosts] = useState([]);
@@ -13,7 +18,7 @@ const PostList = ({ userId, variant = 'feed', className }) => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const loadPosts = async () => {
+const loadPosts = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -33,12 +38,55 @@ const PostList = ({ userId, variant = 'feed', className }) => {
           data = await postService.getAll();
       }
       
-      setPosts(data);
+      // Filter posts based on privacy settings and blocked users
+      const filteredPosts = await filterPostsByPrivacy(data);
+      setPosts(filteredPosts);
     } catch (err) {
       setError(err.message || 'Failed to load posts');
       console.error('Error loading posts:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const filterPostsByPrivacy = async (posts) => {
+    if (!posts || posts.length === 0) return posts;
+    
+    try {
+      const currentUserId = 1; // This would come from auth context
+      const filteredPosts = [];
+      
+      for (const post of posts) {
+        // Skip own posts
+        if (post.userId === currentUserId) {
+          filteredPosts.push(post);
+          continue;
+        }
+        
+        // Check if user is blocked
+        const isBlocked = await userService.isBlocked(currentUserId, post.userId);
+        if (isBlocked) continue;
+        
+        // Check user's privacy settings
+        const privacySettings = await userService.getPrivacySettings(post.userId);
+        
+        // Check post visibility
+        if (privacySettings?.allowPostVisibility === 'nobody') {
+          continue;
+        }
+        
+        if (privacySettings?.allowPostVisibility === 'followers') {
+          const isFollowing = await userService.isFollowing(currentUserId, post.userId);
+          if (!isFollowing) continue;
+        }
+        
+        filteredPosts.push(post);
+      }
+      
+      return filteredPosts;
+    } catch (error) {
+      console.error('Error filtering posts by privacy:', error);
+      return posts; // Return original posts if filtering fails
     }
   };
 

@@ -46,9 +46,18 @@ const UserList = ({ variant = 'all', userId, className }) => {
     loadUsers();
   }, [variant, userId]);
 
-  const handleFollow = async (userIdToFollow) => {
+const handleFollow = async (userIdToFollow) => {
     try {
-      await userService.followUser(1, userIdToFollow); // Current user ID is 1
+      const currentUserId = 1; // This would come from auth context
+      
+      // Check if user is blocked
+      const isBlocked = await userService.isBlocked(currentUserId, userIdToFollow);
+      if (isBlocked) {
+        toast.error('Cannot follow blocked user');
+        return;
+      }
+      
+      await userService.followUser(currentUserId, userIdToFollow);
       toast.success('User followed successfully!');
       
       // Update user counts
@@ -63,9 +72,18 @@ const UserList = ({ variant = 'all', userId, className }) => {
     }
   };
 
-  const handleUnfollow = async (userIdToUnfollow) => {
+const handleUnfollow = async (userIdToUnfollow) => {
     try {
-      await userService.unfollowUser(1, userIdToUnfollow); // Current user ID is 1
+      const currentUserId = 1; // This would come from auth context
+      
+      // Check if user is blocked
+      const isBlocked = await userService.isBlocked(currentUserId, userIdToUnfollow);
+      if (isBlocked) {
+        toast.error('Cannot unfollow blocked user');
+        return;
+      }
+      
+      await userService.unfollowUser(currentUserId, userIdToUnfollow);
       toast.success('User unfollowed successfully!');
       
       // Update user counts
