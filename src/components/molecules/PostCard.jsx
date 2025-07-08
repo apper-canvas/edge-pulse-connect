@@ -2,15 +2,16 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
 import Badge from "@/components/atoms/Badge";
 import Avatar from "@/components/atoms/Avatar";
 import Button from "@/components/atoms/Button";
-import { toast } from "react-hot-toast";
+
 const PostCard = ({ post, onLike, onComment, onShare, className }) => {
-  const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(post.likes || 0);
+  const [isLiked, setIsLiked] = useState(post.isLiked || false);
   const [showFullContent, setShowFullContent] = useState(false);
 // Image loading component with error handling
   const ImageWithFallback = ({ src, alt, className, fallbackSrc, placeholderClassName }) => {
@@ -115,9 +116,9 @@ const PostCard = ({ post, onLike, onComment, onShare, className }) => {
       try {
         await navigator.clipboard.writeText(window.location.href);
         toast.success('Link copied to clipboard!');
-      } catch (error) {
+} catch (error) {
         toast.error('Failed to copy link to clipboard');
-}
+      }
     }
   };
 
