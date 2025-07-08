@@ -2,17 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import PostCard from "@/components/molecules/PostCard";
-import CommentForm from "@/components/molecules/CommentForm";
-import CommentCard from "@/components/molecules/CommentCard";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
+import ApperIcon from "@/components/ApperIcon";
 import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ui/ApperIcon";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import CommentCard from "@/components/molecules/CommentCard";
+import CommentForm from "@/components/molecules/CommentForm";
+import PostCard from "@/components/molecules/PostCard";
+import commentsData from "@/services/mockData/comments.json";
+import postsData from "@/services/mockData/posts.json";
+import usersData from "@/services/mockData/users.json";
+import followsData from "@/services/mockData/follows.json";
 import { postService } from "@/services/api/postService";
 import { commentService } from "@/services/api/commentService";
 
-const PostDetail = () => {
+export default function PostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
@@ -222,5 +226,3 @@ const PostDetail = () => {
     </div>
   );
 };
-
-export default PostDetail;
