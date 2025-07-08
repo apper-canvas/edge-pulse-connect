@@ -173,12 +173,21 @@ const handleShare = async () => {
     });
   };
 
-  const contentPreview = post.content.length > 200 ? 
-    post.content.substring(0, 200) + '...' : 
-    post.content;
+// Safe content extraction - handle both string and object formats
+  const getContentString = (content) => {
+    if (typeof content === 'string') return content;
+    if (content && typeof content === 'object' && content.content) {
+      return content.content;
+    }
+    return '';
+  };
 
-  const shouldShowReadMore = post.content.length > 200;
+  const contentString = getContentString(post.content);
+  const contentPreview = contentString.length > 200 ? 
+    contentString.substring(0, 200) + '...' : 
+    contentString;
 
+  const shouldShowReadMore = contentString.length > 200;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -224,8 +233,8 @@ const handleShare = async () => {
 
       {/* Content */}
       <div className="px-4 pb-3">
-        <div className="text-gray-900 whitespace-pre-wrap">
-          {showFullContent ? post.content : contentPreview}
+<div className="text-gray-900 whitespace-pre-wrap">
+          {showFullContent ? contentString : contentPreview}
           {shouldShowReadMore && (
             <button
               onClick={() => setShowFullContent(!showFullContent)}
